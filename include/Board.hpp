@@ -39,6 +39,7 @@ public:
 	friend std::pair<int, int> findBestMove(Board& board);
 };
 
+// Initialize board and winning table with default values
 Board::Board(size_t size, int numberToWin): size_(size), numberToWin_(numberToWin)
 {
 	board_ = new char* [size_];
@@ -75,6 +76,7 @@ Board::~Board()
 	delete [] winningCells_;
 }
 
+// Draw the grid and current board state
 void Board::draw(sf::RenderWindow& window)
 {
 	sf::Text figure;
@@ -133,6 +135,7 @@ void Board::draw(sf::RenderWindow& window)
 	}
 }
 
+// Place specified figure on a chosen square
 bool Board::makeMove(int row, int col, char player)
 {
 	// Do not place the figure if the square is occupied
@@ -145,7 +148,7 @@ bool Board::makeMove(int row, int col, char player)
 	return true;
 }
 
-
+// Check for win, draw or unfinished
 char Board::checkGameState()
 {
 	int xScoreCounter = 0;
@@ -167,6 +170,12 @@ char Board::checkGameState()
 
 				winningCells_[i][j] = true;
 				winningCells_[i][j + 1] = true;
+			}
+			else
+			{
+				xScoreCounter = 0;
+				oScoreCounter = 0;
+				resetWinningCells();
 			}
 
 			if (xScoreCounter == numberToWin_ - 1)
@@ -201,6 +210,12 @@ char Board::checkGameState()
 				winningCells_[j][i] = true;
 				winningCells_[j + 1][i] = true;
 			}
+			else
+			{
+				xScoreCounter = 0;
+				oScoreCounter = 0;
+				resetWinningCells();
+			}
 
 			if (xScoreCounter == numberToWin_ - 1)
 			{
@@ -220,6 +235,7 @@ char Board::checkGameState()
 
 	// Check diagonals
 	// First from top left to bottom right
+	// start from the second diagnoal beacues we don't need to check single corners
 	for (int line = 2; line <= (size_ * 2) - 2; line++)
 	{
 		int startColumn = std::max(0, int(line - size_));
@@ -238,6 +254,12 @@ char Board::checkGameState()
 
 				winningCells_[std::min(int(size_), line) - j - 1][startColumn + j] = true;
 				winningCells_[std::min(int(size_), line) - j - 2][startColumn + j + 1] = true;
+			}
+			else
+			{
+				xScoreCounter = 0;
+				oScoreCounter = 0;
+				resetWinningCells();
 			}
 
 			if (xScoreCounter == numberToWin_ - 1)
@@ -278,6 +300,12 @@ char Board::checkGameState()
 
 				winningCells_[startRow + j][startColumn + j] = true;
 				winningCells_[startRow + j + 1][startColumn + j + 1] = true;
+			}
+			else
+			{
+				xScoreCounter = 0;
+				oScoreCounter = 0;
+				resetWinningCells();
 			}
 
 			if (xScoreCounter == numberToWin_ - 1)
@@ -337,6 +365,8 @@ void Board::resetBoard()
 	}
 }
 
+// This method is used when we just want to check if any moves are avaliable and
+// don't need to check for draw or win
 bool Board::isGameFinished()
 {
 	for (int i = 0; i < size_; i++)
@@ -353,11 +383,13 @@ bool Board::isGameFinished()
 	return true;
 }
 
+// Helper method for diagonal traversal
 int Board::minOfThree(int a, int b, int c)
 {
 	return std::min(std::min(a, b), c);
 }
 
+// Helper method for calculating maximum depth
 int Board::emptyCells()
 {
 	int counter = 0;

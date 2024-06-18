@@ -32,6 +32,7 @@ int minimax(Board& board, int depth, int maxDepth, bool isMaximizing, int alpha,
 	if (depth >= maxDepth)
 		return score;
 
+	// Prefer quick wins and slow loses
 	if (score == 10)
 		return score - depth;
 
@@ -51,9 +52,11 @@ int minimax(Board& board, int depth, int maxDepth, bool isMaximizing, int alpha,
 			{
 				if (board.makeMove(i, j, 'o'))
 				{
+					// Recursivly call for child
 					best = std::max(best, minimax(board, depth + 1, maxDepth, !isMaximizing, alpha, beta));
 					alpha = std::max(alpha, best);
 
+					// Cancel move
 					board.board_[i][j] = '0';
 
 					// Edge pruning
@@ -76,9 +79,11 @@ int minimax(Board& board, int depth, int maxDepth, bool isMaximizing, int alpha,
 			{
 				if (board.makeMove(i, j, 'x'))
 				{
+					// Recursivly call for child
 					best = std::min(best, minimax(board, depth + 1, maxDepth, !isMaximizing, alpha, beta));
 					beta = std::min(beta, best);
 
+					// Cancel move
 					board.board_[i][j] = '0';
 
 					// Edge pruning
@@ -103,6 +108,8 @@ std::pair<int, int> findBestMove(Board& board)
 	move.first = -1;
 	move.second = -1;
 
+	// Calculate max depth based on number of empty squares
+	// The more empty squares - the simpler are bot's moves
 	if (board.size_ == 3)
 		maxDepth = 9;
 	else if (board.size_ > 3)
